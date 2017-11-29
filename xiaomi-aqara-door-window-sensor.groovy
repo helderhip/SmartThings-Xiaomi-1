@@ -90,28 +90,32 @@ metadata {
 }
 
 def parse(String description) {
-	def linkText = getLinkText(device) + ' [parse]'
-	log.debug "${linkText}: '${description}'"
+def linkText = getLinkText(device) + ' [parse]'
+log.debug "${linkText}: '${description}'"
 
-//  send event for heartbeat
-   def now = new Date().format("yyyy MMM dd EEE h:mm:ss a", location.timeZone)
-   sendEvent(name: "lastCheckin", value: now)
+// send event for heartbeat
+log.debug "${linkText}: before now'"
+def now = new Date()
+log.debug "${linkText}: Now: '${now}'"
+sendEvent(name: "lastCheckin", value: now)
+log.debug "After sendEvent"
 
-   Map map = [:]
+Map map = [:]
 
-   if (description?.startsWith('on/off: ')) {
-      map = parseCustomMessage(description)
-      sendEvent(name: "lastOpened", value: now)
-	}
-   if (description?.startsWith('catchall:')) {
-      map = parseCatchAllMessage(description)
-    }
-   log.debug "${linkText}: Parse returned $map"
-   def results = map ? createEvent(map) : null
-
-   return results;
+if (description?.startsWith('on/off: ')) {
+log.debug "${linkText}: startsWith on/off"
+map = parseCustomMessage(description)
+sendEvent(name: "lastOpened", value: now)
 }
+if (description?.startsWith('catchall:')) {
+log.debug "${linkText}: startsWith catchall"
+map = parseCatchAllMessage(description)
+}
+log.debug "${linkText}: Parse returned $map"
+def results = map ? createEvent(map) : null
 
+return results;
+}
 private Map getBatteryResult(rawValue) {
 	def linkText = getLinkText(device) + ' [getBatteryResult]'
 	log.debug "${linkText}: '${rawValue}'"
